@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trimly | URL Shortener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-orb page-orb-left"></div>
+    <div class="page-orb page-orb-right"></div>
+
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Trimly</p>
+          <h1>Short links that feel premium, safe, and instantly usable.</h1>
+          <p class="lede">
+            Turn long URLs into clean shareable links with built-in HTTPS validation, click tracking, and a dashboard that stays easy to scan.
+          </p>
+
+          <div class="hero-points">
+            <span>HTTPS-only destination checks</span>
+            <span>Automatic short code generation</span>
+            <span>Simple analytics at a glance</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel">
+          <div class="panel-head">
+            <p class="eyebrow">Create Link</p>
+            <h2>Paste a URL and get a cleaner version back.</h2>
+          </div>
+
+          <form class="shortener-form" action="/shorten" method="POST">
+            <label>
+              Original URL
+              <input
+                type="text"
+                name="originalUrl"
+                placeholder="Paste your secure URL here"
+                value="<%= formValues.originalUrl %>"
+                required
+              />
+            </label>
+
+            <button type="submit">Create short link</button>
+          </form>
+
+          <% if (errorMessage) { %>
+            <div class="message error"><%= errorMessage %></div>
+          <% } %>
+
+          <% if (createdLink) { %>
+            <div class="message success">
+              <span>Your short URL is ready:</span>
+              <a href="<%= createdLink.shortUrl %>" target="_blank" rel="noreferrer">
+                <%= createdLink.shortUrl %>
+              </a>
+            </div>
+          <% } %>
+        </aside>
+      </section>
+
+      <section class="metrics">
+        <article class="metric-card">
+          <p class="metric-label">Links saved</p>
+          <p class="metric-value"><%= links.length %></p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Total clicks</p>
+          <p class="metric-value"><%= links.reduce((sum, link) => sum + link.clickCount, 0) %></p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Security mode</p>
+          <p class="metric-value metric-text">HTTPS only</p>
+        </article>
+      </section>
+
+      <section class="dashboard">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Link dashboard</p>
+            <h2>Recent short links</h2>
+          </div>
+          <p class="stat">Clean, searchable, and ready to share.</p>
+        </div>
+
+        <% if (!links.length) { %>
+          <div class="empty-state">
+            <h3>No short links yet</h3>
+            <p>Create your first one above and it will appear here instantly.</p>
+          </div>
+        <% } else { %>
+          <div class="link-grid">
+            <% links.forEach((link) => { %>
+              <article class="link-card">
+                <div class="link-card-top">
+                  <div class="link-copy">
+                    <p class="short-url"><%= link.shortUrl %></p>
+                    <a class="original-url" href="<%= link.originalUrl %>" target="_blank" rel="noreferrer">
+                      <%= link.originalUrl %>
+                    </a>
+                  </div>
+                  <form action="/links/<%= link.id %>/delete" method="POST">
+                    <button class="ghost-button" type="submit">Delete</button>
+                  </form>
+                </div>
+
+                <div class="meta-row">
+                  <span><strong><%= link.clickCount %></strong> clicks</span>
+                  <span>Code <strong><%= link.shortCode %></strong></span>
+                  <span>Created <strong><%= new Date(link.createdAt).toLocaleDateString() %></strong></span>
+                </div>
+              </article>
+            <% }) %>
+          </div>
+        <% } %>
+      </section>
+    </main>
+  </body>
+</html>
